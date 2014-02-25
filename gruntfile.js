@@ -62,6 +62,15 @@ module.exports = function(grunt) {
             },
             src: ['test/mocha/**/*.js']
         },
+        simplemocha: {
+          options: {
+            globals: ['should'],
+            timeout: 3000,
+            ignoreLeaks: false,
+            ui: 'bdd'
+          },
+          all: { src: ['test/integration/**/*.js'] }
+        },
         env: {
             test: {
                 NODE_ENV: 'test'
@@ -82,6 +91,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-nodemon');
     grunt.loadNpmTasks('grunt-concurrent');
     grunt.loadNpmTasks('grunt-env');
+    grunt.loadNpmTasks('grunt-simple-mocha');
 
     //Making grunt default to force in order not to break the project.
     grunt.option('force', true);
@@ -90,5 +100,5 @@ module.exports = function(grunt) {
     grunt.registerTask('default', ['jshint', 'concurrent']);
 
     //Test task.
-    grunt.registerTask('test', ['env:test', 'mochaTest', 'karma:unit']);
+    grunt.registerTask('test', ['env:test', 'mochaTest', 'karma:unit', 'simplemocha']);
 };
