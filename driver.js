@@ -87,8 +87,13 @@ exports.createDriver = function(options) {
   }
 
   function stop(done) {
-    if (!server) return done();
-    server.close(done);
+    function close(err) {
+      connection.close(function(err2) {
+        done(err || err2);
+      });
+    }
+
+    server && server.close(close) || close();
   }
 
   return { 
