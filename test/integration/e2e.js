@@ -22,20 +22,10 @@ function fetchPage(port, path, done) {
 }
 
 function fetchJson(port, path, done) {
-  var page = [];
-  var req = http.request({port: port, method: 'get', path: path}, function(res) { 
-    if (res.statusCode != 200) return done(new Error('Status code ' + res.statusCode));
-    res.setEncoding('utf8');
-    res.on('data', function(ch) { page.push(ch); });
-    res.on('error', function(e) { done(e); });
-    res.on('end', function() {
-      done(null, JSON.parse(page.join('')));
-    });
+  fetchPage(port, path, function(err, payload) {
+    if (err) return done(err);
+    done(null, JSON.parse(payload));
   });
-  req.on('error', function(e) {
-    done(e);
-  });
-  req.end();
 }
 
 describe('Apple', function() {
