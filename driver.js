@@ -13,21 +13,21 @@ var express = require('express'),
  * Please note that the order of loading is important.
  */
 
-exports.createDriver = function() {
+exports.createDriver = function(options) {
 
   var server;
   var connection;
   function start(done) {
       // Load configurations
       // Set the node enviornment variable if not set before
-      process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+      process.env.NODE_ENV = options.NODE_ENV || process.env.NODE_ENV || 'development';
 
       // Initializing system variables 
       var config = require('./config/config'),
           mongoose = require('mongoose');
 
       // Bootstrap db connection
-      connection = mongoose.createConnection(config.db, function(err) {
+      connection = mongoose.createConnection(options.db || config.db, function(err) {
           // Bootstrap models
           var models_path = __dirname + '/app/models';
           var walk = function(path) {
@@ -75,7 +75,7 @@ exports.createDriver = function() {
 
 
           // Start the app by listening on <port>
-          var port = process.env.PORT || config.port;
+          var port = options.PORT || process.env.PORT || config.port;
           server = app.listen(port, function(err) {
             if (err) return done(err);
             // Initializing logger
