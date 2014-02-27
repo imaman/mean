@@ -15,7 +15,8 @@ var express = require('express'),
 
 exports.createDriver = function() {
 
-  function start() {
+  var server;
+  function start(done) {
     // Load configurations
     // Set the node enviornment variable if not set before
     process.env.NODE_ENV = process.env.NODE_ENV || 'development';
@@ -75,15 +76,24 @@ exports.createDriver = function() {
 
     // Start the app by listening on <port>
     var port = process.env.PORT || config.port;
-    app.listen(port);
-    console.log('Express app started on port ' + port);
+    server = app.listen(port, function(err) {
+      if (err) return done(err);
+      console.log('Express app started at http://localhost:' + port);
+      done();
+    });
 
     // Initializing logger
-    logger.init(app, passport, mongoose);
+    logger.init(app, passport, mongoose.connection);
+  }
+
+  function stop(done) {
+    if (!server) return done();
+    server.close(done);
   }
 
   return { 
-    start: start
+    start: start,
+    stop: stop
   }
 }
 
