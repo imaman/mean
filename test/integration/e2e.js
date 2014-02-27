@@ -4,6 +4,23 @@ var http = require('http');
 
 var driverModule = require('../../driver');
 
+function fetchPage(port, path, done) {
+  var page = [];
+  var req = http.request({port: port, method: 'get', path: path}, function(res) { 
+    if (res.statusCode != 200) return done(new Error('Status code ' + res.statusCode));
+    res.setEncoding('utf8');
+    res.on('data', function(ch) { page.push(ch); });
+    res.on('error', function(e) { done(e); });
+    res.on('end', function() {
+      done(null, page.join(''));
+    });
+  });
+  req.on('error', function(e) {
+    done(e);
+  });
+  req.end();
+}
+
 function fetchJson(port, path, done) {
   var page = [];
   var req = http.request({port: port, method: 'get', path: path}, function(res) { 
@@ -50,6 +67,14 @@ describe('Apple', function() {
           json[0].should.property('created');
           json[0].should.property('_id');
           json[0].should.property('__v');
+          done();
+        });
+    });
+
+    it('serves the main page', function(done) {
+        fetchPage(3000, '/', function(err, html) {
+          if (err) return done(err);
+          html.should.match(/<title>MEAN - A Modern Stack - Development - MEAN - A Modern Stack - Development<.title>/);
           done();
         });
     });
