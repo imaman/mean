@@ -10,7 +10,7 @@ var express = require('express'),
     helpers = require('view-helpers'),
     config = require('./config');
 
-module.exports = function(app, passport, db) {
+module.exports = function(app, passport, connection) {
     app.set('showStackError', true);
 
     // Prettify HTML
@@ -59,7 +59,7 @@ module.exports = function(app, passport, db) {
         app.use(express.session({
             secret: config.sessionSecret,
             store: new mongoStore({
-                db: db.connection.db,
+                db: connection.db,
                 collection: config.sessionCollection
             })
         }));
