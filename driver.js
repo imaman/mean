@@ -27,7 +27,9 @@ exports.createDriver = function(options) {
           mongoose = require('mongoose');
 
       // Bootstrap db connection
-      connection = mongoose.createConnection(options.db || config.db, function(err) {
+      mongoose.connect(options.db || config.db, function(err) {
+          if (err) return done(err);
+          connection = mongoose.connection;
           // Bootstrap models
           var models_path = __dirname + '/app/models';
           var walk = function(path) {
@@ -46,7 +48,7 @@ exports.createDriver = function(options) {
           walk(models_path);
 
           // Bootstrap passport config
-          require('./config/passport')(passport);
+          require('./config/passport')(passport, connection);
 
           var app = express();
 
@@ -93,7 +95,7 @@ exports.createDriver = function(options) {
       });
     }
 
-    server && server.close(close) || close();
+    (server && server.close(close)) || close();
   }
 
   return { 
